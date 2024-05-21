@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>radar_reader</name>
+  <version>0.0.1</version>
+  <description>Radar Reader</description>
+  <maintainer email="simonbjorklund98@gmail.com">Radar Reader</maintainer>
+  <license>MIT</license>
+  <author>Simon Björklund</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>builtin_interfaces</depend>
+
+  <build_depend>rcl</build_depend>
+
+  <exec_depend>rcl</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
