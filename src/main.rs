@@ -12,6 +12,200 @@ use r2r::{
     QosProfile, sensor_msgs::msg::PointCloud2,
 };
 
+#[derive(Debug, PartialEq, Clone, Default)]
+#[repr(C)]
+struct RadarPoint{
+    x: f32,
+    y: f32,
+    z: f32,
+
+    velocity: f32,
+    range: f32,
+    theta: f32,
+    phi: f32,
+
+    rcs: f32,
+    snr: f32,
+    amplitude: f32,
+    power: f32,
+
+    az_conf: i32,
+    el_conf: i32,
+    
+    af_type: i32,
+    af_az_type: i32,
+    af_el_type: i32,
+
+    rdd_idx: i32,
+
+    std_range: f32,
+    std_vel: f32,
+    std_theta: f32,
+    std_phi: f32,
+}
+
+impl RadarPoint {
+    fn new(
+        x: f32,
+        y: f32,
+        z: f32,
+
+        velocity: f32,
+        range: f32,
+        theta: f32,
+        phi: f32,
+
+        rcs: f32,
+        snr: f32,
+        amplitude: f32,
+        power: f32,
+
+        az_conf: i32,
+        el_conf: i32,
+        
+        af_type: i32,
+        af_az_type: i32,
+        af_el_type: i32,
+
+        rdd_idx: i32,
+
+        std_range: f32,
+        std_vel: f32,
+        std_theta: f32,
+        std_phi: f32,
+
+    ) -> Self {
+        Self {
+            x,
+            y,
+            z,
+
+            velocity,
+            range,
+            theta,
+            phi,
+
+            rcs,
+            snr,
+            amplitude,
+            power,
+
+            az_conf,
+            el_conf,
+
+            af_type,
+            af_az_type,
+            af_el_type,
+
+            rdd_idx,
+
+            std_range,
+            std_vel,
+            std_theta,
+            std_phi,
+        }
+    }
+}
+
+impl From<RadarPoint> for RPCL2Point<21> {
+    fn from(point: RadarPoint) -> Self {
+        [
+            point.x.into(),
+            point.y.into(),
+            point.z.into(),
+
+            point.velocity.into(),
+            point.range.into(),
+            point.theta.into(),
+            point.phi.into(),
+
+            point.rcs.into(),
+            point.snr.into(),
+            point.amplitude.into(),
+            point.power.into(),
+
+            point.az_conf.into(),
+            point.el_conf.into(),
+
+            point.af_type.into(),
+            point.af_az_type.into(),
+            point.af_el_type.into(),
+
+            point.rdd_idx.into(),
+
+            point.std_range.into(),
+            point.std_vel.into(),
+            point.std_theta.into(),
+            point.std_phi.into(),
+        ]
+        .into()
+    }
+}
+
+impl From<RPCL2Point<21>> for RadarPoint {
+    fn from(point: RPCL2Point<21>) -> Self {
+        Self::new(
+            point[0].get(),   // x
+            point[1].get(),   // y
+            point[2].get(),   // z
+            point[3].get(),   // velocity
+            point[4].get(),   // range
+            point[5].get(),   // theta
+            point[6].get(),   // phi
+            point[7].get(),   // rcs
+            point[8].get(),   // snr
+            point[9].get(),   // amplitude
+            point[10].get(),  // power
+            point[11].get(),  // az_conf
+            point[12].get(),  // el_conf
+            point[13].get(),  // af_type
+            point[14].get(),  // af_az_type
+            point[15].get(),  // af_el_type
+            point[16].get(),  // rdd_idx
+            point[17].get(),  // std_range
+            point[18].get(),  // std_vel
+            point[19].get(),  // std_theta
+            point[20].get(),  // std_phi
+        )
+    }
+}
+
+
+impl PointConvertible<21> for RadarPoint {
+    fn layout() -> LayoutDescription {
+        LayoutDescription::new(&[
+            LayoutField::new("x", "f32", 4),
+            LayoutField::new("y", "f32", 4),
+            LayoutField::new("z", "f32", 4),
+
+            LayoutField::new("velocity", "f32", 4),
+            LayoutField::new("range", "f32", 4),
+            LayoutField::new("theta", "f32", 4),
+            LayoutField::new("phi", "f32", 4),
+
+            LayoutField::new("rcs", "f32", 4),
+            LayoutField::new("snr", "f32", 4),
+            LayoutField::new("amplitude", "f32", 4),
+            LayoutField::new("power", "f32", 4),
+
+            LayoutField::new("az_conf", "i32", 4),
+            LayoutField::new("el_conf", "i32", 4),
+            
+            LayoutField::new("af_type", "i32", 4),
+            LayoutField::new("af_az_type", "i32", 4),
+            LayoutField::new("af_el_type", "i32", 4),
+
+            LayoutField::new("rdd_idx", "i32", 4),
+
+            LayoutField::new("std_range", "f32", 4),
+            LayoutField::new("std_vel", "f32", 4),
+            LayoutField::new("std_theta", "f32", 4),
+            LayoutField::new("std_phi", "f32", 4),
+        ])
+    }
+}
+
+
 
 
 #[repr(packed)]
@@ -184,18 +378,43 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for i in 0..stream_data.af_data_num_af_det  as usize{
                 
                 if !(stream_data.af_data_snr[i] > 0.0){
-                    println!("Point is zero");
+                    //println!("Point is zero");
                     break;
                 }
-                println!("Range: {:.16}", stream_data.af_data_ran[i]);
-                println!("Theta: {:.16}", stream_data.af_data_theta[i]);
-                println!("Velocity: {:.8}", stream_data.af_data_vel[i]);
-                println!("Result: {:.16}", stream_data.af_data_theta[i].sin()*stream_data.af_data_ran[i]);
+                //println!("Range: {:.16}", stream_data.af_data_ran[i]);
+                //println!("Theta: {:.16}", stream_data.af_data_theta[i]);
+                //println!("Velocity: {:.8}", stream_data.af_data_vel[i]);
+                //println!("Result: {:.16}", stream_data.af_data_theta[i].sin()*stream_data.af_data_ran[i]);
                     
-                cloud_points.push(PointXYZ {
+                cloud_points.push(RadarPoint {
                     x: stream_data.af_data_ran[i],
                     y: stream_data.af_data_theta[i].sin()*stream_data.af_data_ran[i],
                     z: stream_data.af_data_phi[i].sin()*stream_data.af_data_ran[i],
+
+                    velocity: stream_data.af_data_vel[i],
+                    range: stream_data.af_data_ran[i],
+                    theta: stream_data.af_data_theta[i],
+                    phi: stream_data.af_data_phi[i],
+
+                    rcs: stream_data.af_data_rcs[i],
+                    snr: stream_data.af_data_snr[i],
+                    amplitude: stream_data.af_data_amp[i],
+                    power: stream_data.af_data_pow[i],
+
+                    az_conf: stream_data.af_data_az_conf[i],
+                    el_conf: stream_data.af_data_el_conf[i],
+
+                    af_type: stream_data.af_data_af_type[i],
+                    af_az_type: stream_data.af_data_az_af_type[i],
+                    af_el_type: stream_data.af_data_el_af_type[i],
+
+                    rdd_idx: stream_data.af_data_rdd_idx[i],
+
+                    std_range: stream_data.af_data_std_vel[i],
+                    std_vel: stream_data.af_data_std_vel[i],
+                    std_theta: stream_data.af_data_std_theta[i],
+                    std_phi: stream_data.af_data_std_phi[i],
+
                 });
             }
             
