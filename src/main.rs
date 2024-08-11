@@ -364,17 +364,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let slice = &buf[28..1472];
 
-        println!("length: {0}", slice.len());
+        //println!("length: {0}", slice.len());
 
         data_buffer.extend_from_slice(&slice);
 
         if header.stream_chunk_idx == 73 {
 
-            println!("lenghth: {0}", data_buffer.len());
+            //println!("lenghth: {0}", data_buffer.len());
 
             let stream_data: StreamData = deserialize(&data_buffer).unwrap();
 
-            println!("array {:?}", stream_data.af_data_ran);
+            //println!("array {:?}", stream_data.af_data_ran);
 
             
             let mut cloud_points = Vec::new();
