@@ -364,14 +364,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let slice = &buf[28..1472];
 
+        println!("length: {0}", slice.len());
+
         data_buffer.extend_from_slice(&slice);
 
         if header.stream_chunk_idx == 73 {
-            for _ in 0..66 {
-                data_buffer.push(0);
-            }
+
+            println!("lenghth: {0}", data_buffer.len());
 
             let stream_data: StreamData = deserialize(&data_buffer).unwrap();
+
+            println!("array {:?}", stream_data.af_data_ran);
 
             
             let mut cloud_points = Vec::new();
@@ -385,6 +388,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //println!("Theta: {:.16}", stream_data.af_data_theta[i]);
                 //println!("Velocity: {:.8}", stream_data.af_data_vel[i]);
                 //println!("Result: {:.16}", stream_data.af_data_theta[i].sin()*stream_data.af_data_ran[i]);
+
                     
                 cloud_points.push(RadarPoint {
                     x: stream_data.af_data_ran[i],
@@ -429,4 +433,3 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         
     }
 }
-
